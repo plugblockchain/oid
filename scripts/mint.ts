@@ -2,7 +2,8 @@ import { ethers } from "hardhat";
 
 async function main() {
   const contractAddress = process.env.DEPLOYED_ADDRESS || "";
-  const endUser = new ethers.Wallet(process.env.END_USER_KEY || "");
+  const signers = await ethers.getSigners();
+  const endUser = signers[0];
   const otto = await ethers.getContractAt("Otto", contractAddress);
   const signingKey = new ethers.Wallet(process.env.SIGNER_KEY || "");
   const data = ethers.utils.defaultAbiCoder.encode(

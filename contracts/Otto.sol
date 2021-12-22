@@ -5,15 +5,15 @@ import "@openzeppelin/contracts/token/ERC721/ERC721.sol";
 import "@openzeppelin/contracts/token/ERC721/extensions/ERC721URIStorage.sol";
 import "@openzeppelin/contracts/security/Pausable.sol";
 import "@openzeppelin/contracts/access/AccessControl.sol";
+import "@openzeppelin/contracts/token/ERC721/extensions/ERC721Enumerable.sol";
 import "@openzeppelin/contracts/token/ERC721/extensions/ERC721Burnable.sol";
-import "@openzeppelin/contracts/proxy/utils/Initializable.sol";
 import "@openzeppelin/contracts/utils/Counters.sol";
 import "@openzeppelin/contracts/utils/Address.sol";
 import "@openzeppelin/contracts/utils/cryptography/ECDSA.sol";
 
 contract Otto is
-    Initializable,
     ERC721,
+    ERC721Enumerable,
     ERC721URIStorage,
     Pausable,
     AccessControl,
@@ -40,7 +40,6 @@ contract Otto is
 
     Status public status;
 
-    /// @custom:oz-upgrades-unsafe-allow constructor
     constructor(
         address signer,
         uint256 mintFee,
@@ -110,9 +109,10 @@ contract Otto is
 
         require(_verify(_hash(cid, msg.sender), token), "Invalid token.");
         uint256 tokenId = _tokenIdCounter.current();
+        _tokenIdCounter.increment();
         _safeMint(msg.sender, tokenId);
-        ownedTokens[msg.sender].push(tokenId);
         _setTokenURI(tokenId, cid);
+        ownedTokens[msg.sender].push(tokenId);
         return tokenId;
     }
 
@@ -120,7 +120,7 @@ contract Otto is
         address from,
         address to,
         uint256 tokenId
-    ) internal override whenNotPaused {
+    ) internal override(ERC721, ERC721Enumerable) whenNotPaused {
         super._beforeTokenTransfer(from, to, tokenId);
     }
 
@@ -145,7 +145,7 @@ contract Otto is
     function supportsInterface(bytes4 interfaceId)
         public
         view
-        override(ERC721, AccessControl)
+        override(ERC721, ERC721Enumerable, AccessControl)
         returns (bool)
     {
         return super.supportsInterface(interfaceId);
