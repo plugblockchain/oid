@@ -10,6 +10,7 @@ import "@openzeppelin/contracts/token/ERC721/extensions/ERC721Burnable.sol";
 import "@openzeppelin/contracts/utils/Counters.sol";
 import "@openzeppelin/contracts/utils/Address.sol";
 import "@openzeppelin/contracts/utils/cryptography/ECDSA.sol";
+import "@openzeppelin/contracts/utils/Strings.sol";
 
 contract Otto is
     ERC721,
@@ -54,7 +55,7 @@ contract Otto is
     }
 
     function _baseURI() internal pure override returns (string memory) {
-        return "https://id.ottoblockchain.network/api/token/";
+        return "https://id.ottoblockchain.network/v1/token/";
     }
 
     function _hash(string calldata salt, address _address)
@@ -99,6 +100,14 @@ contract Otto is
         _setTokenURI(tokenId, uri);
     }
 
+    function ownedTokensOf(address owner)
+        public
+        view
+        returns (uint256[] memory)
+    {
+        return ownedTokens[owner];
+    }
+
     function mintOid(string calldata salt, bytes calldata token)
         public
         payable
@@ -115,7 +124,7 @@ contract Otto is
         uint256 tokenId = _tokenIdCounter.current();
         _tokenIdCounter.increment();
         _safeMint(msg.sender, tokenId);
-        _setTokenURI(tokenId, tokenURI(tokenId));
+        _setTokenURI(tokenId, Strings.toString(tokenId));
         ownedTokens[msg.sender].push(tokenId);
         return tokenId;
     }
