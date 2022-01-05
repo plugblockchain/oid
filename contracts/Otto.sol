@@ -53,6 +53,10 @@ contract Otto is
         _modifyFee = modifyFee;
     }
 
+    function _baseURI() internal pure override returns (string memory) {
+        return "https://id.ottoblockchain.network/api/token/";
+    }
+
     function _hash(string calldata salt, address _address)
         internal
         view
@@ -95,7 +99,7 @@ contract Otto is
         _setTokenURI(tokenId, uri);
     }
 
-    function mintOid(string calldata cid, bytes calldata token)
+    function mintOid(string calldata salt, bytes calldata token)
         public
         payable
         virtual
@@ -107,11 +111,11 @@ contract Otto is
             require(msg.value >= _mintFee, "You need to pay");
         }
 
-        require(_verify(_hash(cid, msg.sender), token), "Invalid token.");
+        require(_verify(_hash(salt, msg.sender), token), "Invalid token.");
         uint256 tokenId = _tokenIdCounter.current();
         _tokenIdCounter.increment();
         _safeMint(msg.sender, tokenId);
-        _setTokenURI(tokenId, cid);
+        _setTokenURI(tokenId, tokenURI(tokenId));
         ownedTokens[msg.sender].push(tokenId);
         return tokenId;
     }
