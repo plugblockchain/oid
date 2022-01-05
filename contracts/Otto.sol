@@ -158,4 +158,10 @@ contract Otto is
     function setStatus(Status _status) external onlyRole(DEFAULT_ADMIN_ROLE) {
         status = _status;
     }
+
+    function withdraw(address recv) external onlyRole(DEFAULT_ADMIN_ROLE) {
+        uint256 balance = address(this).balance;
+        require(balance > 0, "Balance is 0");
+        payable(recv).transfer(balance);
+    }
 }

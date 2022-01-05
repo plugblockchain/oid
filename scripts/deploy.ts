@@ -20,8 +20,8 @@ async function main() {
 
   const otto = await Otto.connect(signers[0]).deploy(
     msgSigner.address,
-    ethers.utils.parseEther("1"),
-    ethers.utils.parseEther("1")
+    ethers.utils.parseEther("0.01"),
+    ethers.utils.parseEther("0.01")
   );
 
   await otto.deployed();
